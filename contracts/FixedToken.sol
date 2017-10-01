@@ -27,9 +27,9 @@ contract FixedToken is ERC20TokenI, Owned
 	function totalSupply()
 		public
 		constant
-		returns (uint totalSupply)
+		returns (uint total)
 	{
-		totalSupply = totalTokens;
+		total = totalTokens;
 	}
 
 	function balanceOf(address _owner)
@@ -57,13 +57,23 @@ contract FixedToken is ERC20TokenI, Owned
 	}
 
 	function transferFrom(address _from, address _to, uint _value)
-		public	
+		public
 		returns (bool success)
 	{
 		require(_from != address(0));
 		require(_to != address(0));
+		require(_value > 0);
 
 		// TODO
+		require(allowance(_from, _to) >= _value);
+		require(balances[_from] >= _value);
+		require(balances[_to] + _value > balances[_to]);
+
+		allowed[_from][_to] -= _value;
+		balances[_from] -= _value;
+		balances[_to] += _value;
+		Transfer(_from, _to, _value);
+
 		return true;
 	}
 
